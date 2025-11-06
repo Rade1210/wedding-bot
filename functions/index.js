@@ -100,7 +100,7 @@ findApp.post("/", async (req, res) => {
 });
 exports.findWeddingDressWebhook = functions.https.onRequest(findApp);
 
-// --------------- SELECT DRESS WEBHOOK ---------------
+// --------------- SELECT DRESS WEBHOOK - MULTIPLE SELECTIONS ---------------
 const selectApp = express();
 selectApp.use(bodyParser.json());
 
@@ -109,8 +109,19 @@ selectApp.post("/", async (req, res) => {
     const params = req.body.sessionInfo.parameters;
     console.log("SELECT_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
     
-    // Use the exact parameter name defined in your Dialogflow UI
-    const selectedNumber = Number(params.selectedNumber ?? params.selectednumber);
+    // Accept both camelCase and lowercase for selectedNumbers
+    let selectedNumbers = params.selectedNumbers || params.selectednumbers;
+    if (!selectedNumbers) {
+      // Backward-compat: try single number parameter
+      selectedNumbers = params.selectedNumber || params.selectednumber;
+    }
+    // Always treat as array (even if only one number provided)
+    if (!Array.isArray(selectedNumbers)) {
+      selectedNumbers = [selectedNumbers];
+    }
+    // Convert all to numbers and filter out invalid values
+    selectedNumbers = selectedNumbers.map(Number).filter(n => !isNaN(n));
+
     const matchingDresses = params.matchingDresses || [];
 
     if (!Array.isArray(matchingDresses) || matchingDresses.length === 0) {
@@ -123,51 +134,49 @@ selectApp.post("/", async (req, res) => {
       });
     }
 
-    if (!selectedNumber || selectedNumber < 1 || selectedNumber > matchingDresses.length) {
+    // Validate and collect all selected dresses (1-based to 0-based index)
+    const selectedDresses = [];
+    for (const num of selectedNumbers) {
+      if (num >= 1 && num <= matchingDresses.length) {
+        selectedDresses.push(matchingDresses[num - 1]);
+      }
+    }
+
+    if (!selectedDresses.length) {
       return res.json({
         fulfillment_response: {
           messages: [
-            { text: { text: ["That number doesn't match any dress in the list, please try again!"] } }
+            { text: { text: ["Those numbers don't match any dresses in the list, please try again!"] } }
           ]
         }
       });
     }
 
-    const selectedDress = matchingDresses[selectedNumber - 1];
+    // Build list of selected dresses as cards
+    const selectedDressCards = selectedDresses.map(dress => ([
+      {
+        type: "image",
+        rawUrl: dress.image_url,
+        accessibilityText: dress.name
+      },
+      {
+        type: "info",
+        title: dress.name,
+        subtitle: `Price: $${dress.price}\n${dress.description}`
+      }
+    ]));
 
-    if (!selectedDress) {
-      return res.json({
-        fulfillment_response: {
-          messages: [
-            { text: { text: ["Couldn't retrieve the selected dress details."] } }
-          ]
-        }
-      });
-    }
+    // Build a summary message
+    const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. Would you like to proceed with booking, or view more dresses?`;
 
     res.json({
       fulfillment_response: {
         messages: [
           {
-            payload: {
-              richContent: [
-                [
-                  {
-                    type: "image",
-                    rawUrl: selectedDress.image_url,
-                    accessibilityText: selectedDress.name
-                  },
-                  {
-                    type: "info",
-                    title: selectedDress.name,
-                    subtitle: `Price: $${selectedDress.price}\n${selectedDress.description}`
-                  }
-                ]
-              ]
-            }
+            payload: { richContent: selectedDressCards }
           },
           {
-            text: { text: [`You selected "${selectedDress.name}". Would you like to proceed with booking or see more dresses?`] }
+            text: { text: [summary] }
           }
         ]
       }
@@ -177,7 +186,7 @@ selectApp.post("/", async (req, res) => {
     console.error("SelectDress Webhook error:", error);
     res.json({
       fulfillment_response: {
-        messages: [{ text: { text: ["Sorry, something went wrong while selecting the dress."] } }]
+        messages: [{ text: { text: ["Sorry, something went wrong while selecting the dress(es)."] } }]
       }
     });
   }
