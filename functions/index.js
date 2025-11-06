@@ -5,10 +5,9 @@ const bodyParser = require("body-parser");
 
 // Firebase Admin initialization
 if (!admin.apps.length) admin.initializeApp();
-
 const db = admin.firestore();
 
-// --------------- FIND DRESS WEBHOOK ---------------
+// ------------ FIND DRESS WEBHOOK ------------
 const findApp = express();
 findApp.use(bodyParser.json());
 
@@ -20,12 +19,10 @@ findApp.post("/", async (req, res) => {
     const minPrice = Number(params.dress_min_price);
     const maxPrice = Number(params.dress_max_price);
 
-    // Logging incoming params
     console.log("FIND_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
 
     const snapshot = await db.collection("dresses").get();
     const matchingDresses = [];
-
     snapshot.forEach(doc => {
       const data = doc.data();
       const inRange = data.price >= minPrice && data.price <= maxPrice;
@@ -44,13 +41,8 @@ findApp.post("/", async (req, res) => {
 
     let messages;
     if (matchingDresses.length === 0) {
-      messages = [
-        {
-          text: { text: ["I couldn’t find any dresses matching your criteria. Would you like to adjust your search?"] }
-        }
-      ];
+      messages = [{ text: { text: ["I couldn’t find any dresses matching your criteria. Would you like to adjust your search?"] } }];
     } else {
-      // Each card is an array of image/info objects as required by Dialogflow Messenger richContent
       const richContent = matchingDresses.map((dress, idx) => [
         {
           type: "image",
@@ -65,25 +57,17 @@ findApp.post("/", async (req, res) => {
             {
               text: "Select this Dress",
               event: {
-                name: "select-dress", // This event should map to your 'Select Dress' intent/route
+                name: "select-dress",
                 languageCode: "",
-                parameters: { selectedNumber: idx + 1 } // Use correct case!
+                parameters: { selectedNumber: idx + 1 }
               }
             }
           ]
         }
       ]);
-
-      messages = [
-        {
-          payload: {
-            richContent: richContent
-          }
-        }
-      ];
+      messages = [{ payload: { richContent } }];
     }
 
-    // Ensure matchingDresses is passed as a session parameter for the select intent
     res.json({
       sessionInfo: { parameters: { ...params, matchingDresses } },
       fulfillment_response: { messages }
@@ -100,7 +84,7 @@ findApp.post("/", async (req, res) => {
 });
 exports.findWeddingDressWebhook = functions.https.onRequest(findApp);
 
-// --------------- SELECT DRESS WEBHOOK - MULTIPLE SELECTIONS ---------------
+// ------------ SELECT DRESS WEBHOOK (MULTI + CHIPS, Messenger friendly) ------------
 const selectApp = express();
 selectApp.use(bodyParser.json());
 
@@ -108,18 +92,10 @@ selectApp.post("/", async (req, res) => {
   try {
     const params = req.body.sessionInfo.parameters;
     console.log("SELECT_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
-    
-    // Accept both camelCase and lowercase for selectedNumbers
-    let selectedNumbers = params.selectedNumbers || params.selectednumbers;
-    if (!selectedNumbers) {
-      // Backward-compat: try single number parameter
-      selectedNumbers = params.selectedNumber || params.selectednumber;
-    }
-    // Always treat as array (even if only one number provided)
-    if (!Array.isArray(selectedNumbers)) {
-      selectedNumbers = [selectedNumbers];
-    }
-    // Convert all to numbers and filter out invalid values
+
+    // Get numbers (array): supports any incoming case
+    let selectedNumbers = params.selectedNumbers || params.selectednumbers || params.selectedNumber || params.selectednumber;
+    if (!Array.isArray(selectedNumbers)) selectedNumbers = [selectedNumbers];
     selectedNumbers = selectedNumbers.map(Number).filter(n => !isNaN(n));
 
     const matchingDresses = params.matchingDresses || [];
@@ -134,7 +110,7 @@ selectApp.post("/", async (req, res) => {
       });
     }
 
-    // Validate and collect all selected dresses (1-based to 0-based index)
+    // Select valid dresses
     const selectedDresses = [];
     for (const num of selectedNumbers) {
       if (num >= 1 && num <= matchingDresses.length) {
@@ -152,7 +128,7 @@ selectApp.post("/", async (req, res) => {
       });
     }
 
-    // Build list of selected dresses as cards
+    // Each dress as a card (array of image+info)
     const selectedDressCards = selectedDresses.map(dress => ([
       {
         type: "image",
@@ -166,18 +142,30 @@ selectApp.post("/", async (req, res) => {
       }
     ]));
 
-    // Build a summary message
-    const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. Would you like to proceed with booking, or view more dresses?`;
+    // Next action chips/buttons
+    const nextActionChips = {
+      type: "chips",
+      options: [
+        { text: "Proceed with booking" },
+        { text: "See more dresses" },
+        { text: "Start over" }
+      ]
+    };
+
+    // Combine all cards and chips into one richContent array (Messenger requires this!)
+    const richContentAll = [
+      ...selectedDressCards,
+      [nextActionChips]
+    ];
+
+    // Summary message
+    const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. What would you like to do next?`;
 
     res.json({
       fulfillment_response: {
         messages: [
-          {
-            payload: { richContent: selectedDressCards }
-          },
-          {
-            text: { text: [summary] }
-          }
+          { payload: { richContent: richContentAll } },
+          { text: { text: [summary] } }
         ]
       }
     });
