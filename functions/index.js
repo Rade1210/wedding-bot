@@ -3,25 +3,25 @@ const express = require("express");
 const admin = require("firebase-admin");
 const bodyParser = require("body-parser");
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-  });
-}
+// Firebase Admin initialization
+if (!admin.apps.length) admin.initializeApp();
 
 const db = admin.firestore();
-const app = express();
-app.use(bodyParser.json());
 
-// Webhook endpoint
-app.post("/", async (req, res) => {
+// --------------- FIND DRESS WEBHOOK ---------------
+const findApp = express();
+findApp.use(bodyParser.json());
+
+findApp.post("/", async (req, res) => {
   try {
-    const sessionInfo = req.body.sessionInfo.parameters;
-    const dressType = sessionInfo.dress_type;
-    const dressSize = Number(sessionInfo.dress_size);
-    const minPrice = Number(sessionInfo.dress_min_price);
-    const maxPrice = Number(sessionInfo.dress_max_price);
+    const params = req.body.sessionInfo.parameters;
+    const dressType = params.dress_type;
+    const dressSize = Number(params.dress_size);
+    const minPrice = Number(params.dress_min_price);
+    const maxPrice = Number(params.dress_max_price);
+
+    // Logging incoming params
+    console.log("FIND_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
 
     const snapshot = await db.collection("dresses").get();
     const matchingDresses = [];
@@ -29,10 +29,9 @@ app.post("/", async (req, res) => {
     snapshot.forEach(doc => {
       const data = doc.data();
       const inRange = data.price >= minPrice && data.price <= maxPrice;
-      const typeMatch = data.type.toLowerCase() === dressType.toLowerCase();
-      const sizeMatch = data.size_available.includes(dressSize);
-      const inStock = data.in_stock === true;
-
+      const typeMatch = data.type && data.type.toLowerCase() === dressType.toLowerCase();
+      const sizeMatch = data.size_available && data.size_available.includes(dressSize);
+      const inStock = !!data.in_stock;
       if (inRange && typeMatch && sizeMatch && inStock) {
         matchingDresses.push({
           name: data.name,
@@ -47,12 +46,12 @@ app.post("/", async (req, res) => {
     if (matchingDresses.length === 0) {
       messages = [
         {
-          text: { text: ["I couldn’t find any dresses that match your criteria. Would you like to adjust your search?"] }
+          text: { text: ["I couldn’t find any dresses matching your criteria. Would you like to adjust your search?"] }
         }
       ];
     } else {
-      // Build rich content cards with numbers and selection buttons
-      const richContent = matchingDresses.map((dress, index) => [
+      // Each card is an array of image/info objects as required by Dialogflow Messenger richContent
+      const richContent = matchingDresses.map((dress, idx) => [
         {
           type: "image",
           rawUrl: dress.image_url,
@@ -60,13 +59,16 @@ app.post("/", async (req, res) => {
         },
         {
           type: "info",
-          title: `${index + 1}️⃣ ${dress.name}`, // Numbered title
+          title: `${idx + 1}️⃣ ${dress.name}`,
           subtitle: `Price: $${dress.price}\n${dress.description}`,
-          actionLink: "",
-          button: [
+          buttons: [
             {
               text: "Select this Dress",
-              postback: dress.name
+              event: {
+                name: "select-dress", // This event should map to your 'Select Dress' intent/route
+                languageCode: "",
+                parameters: { selectedNumber: idx + 1 } // Use correct case!
+              }
             }
           ]
         }
@@ -81,22 +83,103 @@ app.post("/", async (req, res) => {
       ];
     }
 
-    // Send response to Dialogflow CX
+    // Ensure matchingDresses is passed as a session parameter for the select intent
     res.json({
-      fulfillment_response: { messages: messages }
+      sessionInfo: { parameters: { ...params, matchingDresses } },
+      fulfillment_response: { messages }
     });
 
   } catch (error) {
-    console.error("Webhook error:", error);
+    console.error("FindWeddingDress Webhook error:", error);
     res.json({
       fulfillment_response: {
-        messages: [
-          { text: { text: ["Sorry, something went wrong while fetching the dresses."] } }
-        ]
+        messages: [{ text: { text: ["Sorry, something went wrong while fetching the dresses."] } }]
       }
     });
   }
 });
+exports.findWeddingDressWebhook = functions.https.onRequest(findApp);
 
-// Export the webhook as a Firebase Function
-exports.webhook = functions.https.onRequest(app);
+// --------------- SELECT DRESS WEBHOOK ---------------
+const selectApp = express();
+selectApp.use(bodyParser.json());
+
+selectApp.post("/", async (req, res) => {
+  try {
+    const params = req.body.sessionInfo.parameters;
+    console.log("SELECT_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
+    
+    // Use the exact parameter name defined in your Dialogflow UI
+    const selectedNumber = Number(params.selectedNumber ?? params.selectednumber);
+    const matchingDresses = params.matchingDresses || [];
+
+    if (!Array.isArray(matchingDresses) || matchingDresses.length === 0) {
+      return res.json({
+        fulfillment_response: {
+          messages: [
+            { text: { text: ["Sorry, I couldn't find the dresses you previously viewed. Please search again!"] } }
+          ]
+        }
+      });
+    }
+
+    if (!selectedNumber || selectedNumber < 1 || selectedNumber > matchingDresses.length) {
+      return res.json({
+        fulfillment_response: {
+          messages: [
+            { text: { text: ["That number doesn't match any dress in the list, please try again!"] } }
+          ]
+        }
+      });
+    }
+
+    const selectedDress = matchingDresses[selectedNumber - 1];
+
+    if (!selectedDress) {
+      return res.json({
+        fulfillment_response: {
+          messages: [
+            { text: { text: ["Couldn't retrieve the selected dress details."] } }
+          ]
+        }
+      });
+    }
+
+    res.json({
+      fulfillment_response: {
+        messages: [
+          {
+            payload: {
+              richContent: [
+                [
+                  {
+                    type: "image",
+                    rawUrl: selectedDress.image_url,
+                    accessibilityText: selectedDress.name
+                  },
+                  {
+                    type: "info",
+                    title: selectedDress.name,
+                    subtitle: `Price: $${selectedDress.price}\n${selectedDress.description}`
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            text: { text: [`You selected "${selectedDress.name}". Would you like to proceed with booking or see more dresses?`] }
+          }
+        ]
+      }
+    });
+
+  } catch (error) {
+    console.error("SelectDress Webhook error:", error);
+    res.json({
+      fulfillment_response: {
+        messages: [{ text: { text: ["Sorry, something went wrong while selecting the dress."] } }]
+      }
+    });
+  }
+});
+exports.selectDressWebhook = functions.https.onRequest(selectApp);
