@@ -55,18 +55,18 @@
             top: auto !important;
         }
 
-        /* Fix the chat bubble - remove rectangle */
+        /* Clean chat bubble - NO animation, NO purple circle */
         df-messenger-chat-bubble {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
-            width: 60px !important;
-            height: 60px !important;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3) !important;
-            border: 3px solid white !important;
+            /* Remove all animations */
+            animation: none !important;
+            /* Clean styling */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            border: 2px solid white !important;
             border-radius: 50% !important;
-            background: #8b5cf6 !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.2s ease !important;
         }
 
         /* Remove any background rectangle from the button */
@@ -101,50 +101,13 @@
             --df-messenger-message-border-radius: 20px;
             --df-messenger-button-color: #8b5cf6;
             --df-messenger-input-box-border-radius: 25px;
-            --df-messenger-chat-bubble-background-color: #8b5cf6 !important;
-            --df-messenger-chat-bubble-icon-color: #ffffff !important;
         }
 
-        /* NO ANIMATION when chat is open */
-        df-messenger[opened] df-messenger-chat-bubble {
-            animation: none !important;
-        }
-
-        /* Very subtle and occasional animation only when closed and not hovered */
-        df-messenger:not([opened]) df-messenger-chat-bubble:not(:hover) {
-            animation: subtle-attention 8s ease-in-out infinite !important;
-        }
-
-        /* Very gentle and rare animation */
-        @keyframes subtle-attention {
-            0%, 85% { 
-                transform: scale(1);
-                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
-            }
-            87% { 
-                transform: scale(1.03);
-                box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-            }
-            89% { 
-                transform: scale(1);
-                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
-            }
-            91% { 
-                transform: scale(1.02);
-                box-shadow: 0 7px 22px rgba(139, 92, 246, 0.35);
-            }
-            93%, 100% { 
-                transform: scale(1);
-                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
-            }
-        }
-
-        /* Smooth hover effect - no animation during hover */
+        /* Simple hover effect only */
         df-messenger-chat-bubble:hover {
-            transform: scale(1.08) !important;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5) !important;
-            animation: none !important;
-            transition: all 0.3s ease !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.2s ease !important;
         }
 
         /* Features grid */
@@ -201,11 +164,6 @@
             df-messenger {
                 bottom: 20px !important;
                 right: 20px !important;
-            }
-            
-            df-messenger-chat-bubble {
-                width: 55px !important;
-                height: 55px !important;
             }
         }
 
