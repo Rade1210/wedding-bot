@@ -8,214 +8,57 @@
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
     
     <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #faf7f4 0%, #fef7ff 100%);
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Welcome content */
-        .welcome-content {
-            text-align: center;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .welcome-content h1 {
-            color: #7c3aed;
-            font-size: 3rem;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
-
-        .welcome-content p {
-            color: #6b7280;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        /* DF Messenger - FIXED POSITIONING */
-        df-messenger {
-            z-index: 9999 !important;
-            position: fixed !important;
-            bottom: 30px !important;
-            right: 30px !important;
-            left: auto !important;
-            top: auto !important;
-        }
-
-        /* Remove ALL animations and purple background */
+        /* Hide the default chat bubble */
         df-messenger-chat-bubble {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            /* Remove all animations and transforms */
-            animation: none !important;
-            transform: none !important;
-            /* Remove purple background */
-            background: transparent !important;
-            /* Remove custom styling that causes issues */
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-            width: auto !important;
-            height: auto !important;
+            display: none !important;
         }
-
-        /* Remove any custom button styling */
-        .df-messenger-chat-bubble-button {
-            background: transparent !important;
-            border: none !important;
-            transform: none !important;
-            animation: none !important;
-        }
-
-        /* Remove icon custom styling */
-        .df-messenger-chat-bubble-icon {
-            background: transparent !important;
-            border: none !important;
-            transform: none !important;
-            animation: none !important;
-        }
-
-        /* COMPLETELY remove hover effects */
-        df-messenger-chat-bubble:hover,
-        df-messenger-chat-bubble:focus,
-        df-messenger-chat-bubble:active {
-            transform: none !important;
-            scale: none !important;
-            animation: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-
-        /* Chat window styling */
-        .df-messenger-wrapper {
-            border-radius: 16px !important;
-            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3) !important;
-            border: 2px solid #e9d5ff !important;
-        }
-
-        /* Chat background and messages */
-        df-messenger {
-            --df-messenger-font-color: #2d3748;
-            --df-messenger-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --df-messenger-chat-background: #faf7f4;
-            --df-messenger-message-user-background: #8b5cf6;
-            --df-messenger-message-bot-background: #ffffff;
-            --df-messenger-message-border-radius: 20px;
-            --df-messenger-button-color: #8b5cf6;
-            --df-messenger-input-box-border-radius: 25px;
-            /* Remove purple bubble background variable */
-            --df-messenger-chat-bubble-background-color: transparent !important;
-        }
-
-        /* Features grid */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 50px;
-        }
-
-        .feature {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+        
+        /* Custom chat button */
+        .custom-chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            border: 2px solid white;
+            z-index: 10000;
             transition: all 0.3s ease;
-            border: 1px solid #f3f4f6;
         }
-
-        .feature:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+        
+        .custom-chat-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
-
-        .feature h3 {
-            color: #7c3aed;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .feature p {
-            color: #6b7280;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .welcome-content h1 {
-                font-size: 2.2rem;
-            }
-            
-            .welcome-content p {
-                font-size: 1.1rem;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            df-messenger {
-                bottom: 20px !important;
-                right: 20px !important;
-            }
-        }
-
-        /* For very small screens */
-        @media (max-width: 480px) {
-            .welcome-content {
-                padding: 20px 10px;
-            }
-            
-            .welcome-content h1 {
-                font-size: 1.8rem;
-            }
-            
-            df-messenger {
-                bottom: 15px !important;
-                right: 15px !important;
-            }
+        
+        /* Position the actual DF messenger off-screen but keep it functional */
+        df-messenger {
+            position: fixed !important;
+            bottom: -1000px !important;
+            right: -1000px !important;
         }
     </style>
 </head>
 <body>
     <div class="welcome-content">
         <h1>👗 Wedding Dress Finder</h1>
-        <p>Discover your dream wedding dress with our AI stylist. Get personalized recommendations based on your style, size, and budget preferences.</p>
-        
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 Perfect Match</h3>
-                <p>Intelligent recommendations tailored to your body type, style preferences, and wedding theme</p>
-            </div>
-            <div class="feature">
-                <h3>💰 Budget Smart</h3>
-                <p>Find stunning dresses that fit your budget without compromising on quality or style</p>
-            </div>
-            <div class="feature">
-                <h3>📅 Easy Booking</h3>
-                <p>Seamlessly schedule appointments and try-ons when you find the perfect dress</p>
-            </div>
-        </div>
+        <p>Discover your dream wedding dress with our AI stylist.</p>
     </div>
 
+    <!-- Custom chat button -->
+    <div class="custom-chat-button" onclick="openChat()">
+        👗
+    </div>
+
+    <!-- Hidden DF Messenger -->
     <df-messenger
         location="us-central1"
         project-id="virtual-agent-training-476115"
@@ -225,5 +68,18 @@
         <df-messenger-chat-bubble chat-title="Wedding Stylist 👰">
         </df-messenger-chat-bubble>
     </df-messenger>
+
+    <script>
+        function openChat() {
+            // Find and click the hidden chat bubble
+            const chatBubble = document.querySelector('df-messenger-chat-bubble');
+            if (chatBubble) {
+                chatBubble.click();
+            }
+        }
+        
+        // Optional: Also open chat when custom button is clicked
+        document.querySelector('.custom-chat-button').addEventListener('click', openChat);
+    </script>
 </body>
 </html>
