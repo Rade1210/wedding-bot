@@ -45,54 +45,17 @@
             margin-bottom: 30px;
         }
 
-        /* Make DF Messenger completely invisible but functional */
+        /* DF Messenger - WORKING STYLING */
         df-messenger {
-            z-index: 9998 !important;
-            position: fixed !important;
-            bottom: 30px !important;
-            right: 30px !important;
-            opacity: 0.01 !important; /* Almost invisible but clickable */
-            pointer-events: auto !important; /* Ensure it's clickable */
-        }
-
-        /* Make the chat bubble invisible but clickable */
-        df-messenger-chat-bubble {
-            opacity: 0.01 !important;
-            pointer-events: auto !important;
-        }
-        
-        /* Custom chat button that overlays the invisible DF bubble */
-        .custom-chat-button {
+            z-index: 9999;
             position: fixed;
+            --df-messenger-font-color: #000;
+            --df-messenger-font-family: Google Sans;
+            --df-messenger-chat-background: #f3f6fc;
+            --df-messenger-message-user-background: #d3e3fd;
+            --df-messenger-message-bot-background: #fff;
             bottom: 30px;
             right: 30px;
-            width: 60px;
-            height: 60px;
-            background: #8b5cf6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-            border: 2px solid white;
-            z-index: 10000;
-            transition: all 0.3s ease;
-            pointer-events: none; /* Let clicks pass through to DF Messenger */
-        }
-        
-        /* Clickable area around the custom button */
-        .click-area {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 80px;
-            height: 80px;
-            background: transparent;
-            z-index: 9999;
-            cursor: pointer;
         }
 
         /* Features grid */
@@ -147,27 +110,11 @@
             }
             
             df-messenger {
-                bottom: 20px !important;
-                right: 20px !important;
-            }
-            
-            .custom-chat-button {
                 bottom: 20px;
                 right: 20px;
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
-            }
-            
-            .click-area {
-                bottom: 15px;
-                right: 15px;
-                width: 70px;
-                height: 70px;
             }
         }
 
-        /* For very small screens */
         @media (max-width: 480px) {
             .welcome-content {
                 padding: 20px 10px;
@@ -178,23 +125,8 @@
             }
             
             df-messenger {
-                bottom: 15px !important;
-                right: 15px !important;
-            }
-            
-            .custom-chat-button {
                 bottom: 15px;
                 right: 15px;
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-            }
-            
-            .click-area {
-                bottom: 10px;
-                right: 10px;
-                width: 60px;
-                height: 60px;
             }
         }
     </style>
@@ -220,7 +152,7 @@
         </div>
     </div>
 
-    <!-- Invisible but clickable DF Messenger -->
+    <!-- Dialogflow Messenger - SIMPLE AND WORKING -->
     <df-messenger
         location="us-central1"
         project-id="virtual-agent-training-476115"
@@ -230,10 +162,5 @@
         <df-messenger-chat-bubble chat-title="Wedding Stylist 👰">
         </df-messenger-chat-bubble>
     </df-messenger>
-
-    <!-- Custom chat button (visual only) -->
-    <div class="custom-chat-button">
-        👗
-    </div>
 </body>
 </html>
