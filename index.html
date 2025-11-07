@@ -8,128 +8,147 @@
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
     
     <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #faf7f4 0%, #fef7ff 100%);
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #faf7f4 0%, #fef7ff 100%);
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+    }
 
-        /* Welcome content */
-        .welcome-content {
-            text-align: center;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    /* Welcome content */
+    .welcome-content {
+        text-align: center;
+        padding: 40px 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
 
+    .welcome-content h1 {
+        color: #7c3aed;
+        font-size: 3rem;
+        margin-bottom: 16px;
+        font-weight: 700;
+    }
+
+    .welcome-content p {
+        color: #6b7280;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    /* Features grid */
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 50px;
+    }
+
+    .feature {
+        background: #fff0fc;
+        padding: 30px 25px;
+        border-radius: 20px;
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #f3f4f6;
+    }
+
+    .feature:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+    }
+
+    .feature h3 {
+        color: #7c3aed;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .feature p {
+        color: #6b7280;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Dialogflow Messenger - Styled */
+    df-messenger {
+        z-index: 9999;
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+
+        --df-messenger-font-color: #2c2c2c;
+        --df-messenger-font-family: 'Segoe UI', sans-serif;
+        --df-messenger-chat-background: #fff0fc;
+        --df-messenger-button-background-color: #7c3aed;
+        --df-messenger-button-hover-background-color: #9f5aed;
+        --df-messenger-message-user-background: #e9d9f8;
+        --df-messenger-message-bot-background: #ffffff;
+        --df-messenger-chat-bubble-border-radius: 16px;
+        --df-messenger-message-border-radius: 16px;
+        --df-messenger-send-icon-color: #fff;
+        --df-messenger-chat-title-color: #7c3aed;
+        --df-messenger-input-box-border-radius: 12px;
+        --df-messenger-input-box-focus-border-color: #7c3aed;
+        --df-messenger-input-box-background-color: #fff;
+    }
+
+    df-messenger::part(header) {
+        border-radius: 16px 16px 0 0;
+    }
+
+    df-messenger::part(chat-message) {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
         .welcome-content h1 {
-            color: #7c3aed;
-            font-size: 3rem;
-            margin-bottom: 16px;
-            font-weight: 700;
+            font-size: 2.2rem;
         }
-
+        
         .welcome-content p {
-            color: #6b7280;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
+            font-size: 1.1rem;
         }
-
-        /* DF Messenger - WORKING STYLING */
-        df-messenger {
-            z-index: 9999;
-            position: fixed;
-            --df-messenger-font-color: #000;
-            --df-messenger-font-family: Google Sans;
-            --df-messenger-chat-background: #f3f6fc;
-            --df-messenger-message-user-background: #d3e3fd;
-            --df-messenger-message-bot-background: #fff;
-            bottom: 30px;
-            right: 30px;
-        }
-
-        /* Features grid */
+        
         .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 50px;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
+        
+        df-messenger {
+            bottom: 20px;
+            right: 20px;
+        }
+    }
 
-        .feature {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
-            transition: all 0.3s ease;
-            border: 1px solid #f3f4f6;
+    @media (max-width: 480px) {
+        .welcome-content {
+            padding: 20px 10px;
         }
-
-        .feature:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+        
+        .welcome-content h1 {
+            font-size: 1.8rem;
         }
-
-        .feature h3 {
-            color: #7c3aed;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            font-weight: 600;
+        
+        df-messenger {
+            bottom: 15px;
+            right: 15px;
         }
-
-        .feature p {
-            color: #6b7280;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .welcome-content h1 {
-                font-size: 2.2rem;
-            }
-            
-            .welcome-content p {
-                font-size: 1.1rem;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            df-messenger {
-                bottom: 20px;
-                right: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .welcome-content {
-                padding: 20px 10px;
-            }
-            
-            .welcome-content h1 {
-                font-size: 1.8rem;
-            }
-            
-            df-messenger {
-                bottom: 15px;
-                right: 15px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="welcome-content">
