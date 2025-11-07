@@ -45,22 +45,23 @@
             margin-bottom: 30px;
         }
 
-        /* Hide the default chat bubble but keep DF messenger functional */
-        df-messenger-chat-bubble {
-            display: none !important;
-        }
-        
-        /* Keep DF messenger in normal position but make it invisible */
+        /* Make DF Messenger completely invisible but functional */
         df-messenger {
             z-index: 9998 !important;
             position: fixed !important;
             bottom: 30px !important;
             right: 30px !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
+            opacity: 0.01 !important; /* Almost invisible but clickable */
+            pointer-events: auto !important; /* Ensure it's clickable */
+        }
+
+        /* Make the chat bubble invisible but clickable */
+        df-messenger-chat-bubble {
+            opacity: 0.01 !important;
+            pointer-events: auto !important;
         }
         
-        /* Custom chat button */
+        /* Custom chat button that overlays the invisible DF bubble */
         .custom-chat-button {
             position: fixed;
             bottom: 30px;
@@ -79,11 +80,19 @@
             border: 2px solid white;
             z-index: 10000;
             transition: all 0.3s ease;
+            pointer-events: none; /* Let clicks pass through to DF Messenger */
         }
         
-        .custom-chat-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        /* Clickable area around the custom button */
+        .click-area {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: transparent;
+            z-index: 9999;
+            cursor: pointer;
         }
 
         /* Features grid */
@@ -149,6 +158,13 @@
                 height: 55px;
                 font-size: 24px;
             }
+            
+            .click-area {
+                bottom: 15px;
+                right: 15px;
+                width: 70px;
+                height: 70px;
+            }
         }
 
         /* For very small screens */
@@ -172,6 +188,13 @@
                 width: 50px;
                 height: 50px;
                 font-size: 22px;
+            }
+            
+            .click-area {
+                bottom: 10px;
+                right: 10px;
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -197,14 +220,8 @@
         </div>
     </div>
 
-    <!-- Custom chat button -->
-    <div class="custom-chat-button" id="customChatButton">
-        👗
-    </div>
-
-    <!-- DF Messenger (hidden but functional) -->
+    <!-- Invisible but clickable DF Messenger -->
     <df-messenger
-        id="dfMessenger"
         location="us-central1"
         project-id="virtual-agent-training-476115"
         agent-id="de2b3642-5d09-462c-9803-6b0ff3036248"
@@ -214,38 +231,9 @@
         </df-messenger-chat-bubble>
     </df-messenger>
 
-    <script>
-        // Wait for DF Messenger to load
-        document.addEventListener('DOMContentLoaded', function() {
-            const customButton = document.getElementById('customChatButton');
-            const dfMessenger = document.getElementById('dfMessenger');
-            
-            customButton.addEventListener('click', function() {
-                // Find the chat bubble inside the shadow DOM
-                const chatBubble = dfMessenger.shadowRoot.querySelector('df-messenger-chat-bubble');
-                if (chatBubble) {
-                    // Click the chat bubble to open the chat
-                    chatBubble.click();
-                }
-            });
-        });
-
-        // Alternative approach if shadow DOM access is restricted
-        setTimeout(function() {
-            const customButton = document.getElementById('customChatButton');
-            customButton.addEventListener('click', function() {
-                // Try to find and click any clickable element in DF Messenger
-                const dfMessenger = document.getElementById('dfMessenger');
-                if (dfMessenger) {
-                    // Dispatch a click event to the DF Messenger element
-                    dfMessenger.dispatchEvent(new MouseEvent('click', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window
-                    }));
-                }
-            });
-        }, 2000); // Wait 2 seconds for DF Messenger to fully load
-    </script>
+    <!-- Custom chat button (visual only) -->
+    <div class="custom-chat-button">
+        👗
+    </div>
 </body>
 </html>
