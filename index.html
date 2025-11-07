@@ -17,7 +17,7 @@
 
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #faf7f4 0%, #fef7ff 100%);
+        background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
         min-height: 100vh;
         padding: 20px;
         position: relative;
@@ -32,14 +32,14 @@
     }
 
     .welcome-content h1 {
-        color: #7c3aed;
+        color: #111827;
         font-size: 3rem;
         margin-bottom: 16px;
         font-weight: 700;
     }
 
     .welcome-content p {
-        color: #6b7280;
+        color: #4b5563;
         font-size: 1.2rem;
         line-height: 1.6;
         margin-bottom: 30px;
@@ -54,21 +54,21 @@
     }
 
     .feature {
-        background: #fff0fc;
+        background: #ffffff;
         padding: 30px 25px;
-        border-radius: 20px;
-        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
-        border: 1px solid #f3f4f6;
+        border: 1px solid #e5e7eb;
     }
 
     .feature:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
     }
 
     .feature h3 {
-        color: #7c3aed;
+        color: #111827;
         margin-bottom: 15px;
         font-size: 1.3rem;
         font-weight: 600;
@@ -81,27 +81,27 @@
         margin: 0;
     }
 
-    /* Dialogflow Messenger - Styled */
+    /* Dialogflow Messenger - Clean White Styling */
     df-messenger {
         z-index: 9999;
         position: fixed;
         bottom: 30px;
         right: 30px;
 
-        --df-messenger-font-color: #2c2c2c;
+        --df-messenger-font-color: #111827;
         --df-messenger-font-family: 'Segoe UI', sans-serif;
-        --df-messenger-chat-background: #fff0fc;
-        --df-messenger-button-background-color: #7c3aed;
-        --df-messenger-button-hover-background-color: #9f5aed;
-        --df-messenger-message-user-background: #e9d9f8;
+        --df-messenger-chat-background: #ffffff;
+        --df-messenger-button-background-color: #f3f4f6;
+        --df-messenger-button-hover-background-color: #e5e7eb;
+        --df-messenger-message-user-background: #f9fafb;
         --df-messenger-message-bot-background: #ffffff;
         --df-messenger-chat-bubble-border-radius: 16px;
         --df-messenger-message-border-radius: 16px;
-        --df-messenger-send-icon-color: #fff;
-        --df-messenger-chat-title-color: #7c3aed;
+        --df-messenger-send-icon-color: #111827;
+        --df-messenger-chat-title-color: #111827;
         --df-messenger-input-box-border-radius: 12px;
-        --df-messenger-input-box-focus-border-color: #7c3aed;
-        --df-messenger-input-box-background-color: #fff;
+        --df-messenger-input-box-focus-border-color: #9ca3af;
+        --df-messenger-input-box-background-color: #f9fafb;
     }
 
     df-messenger::part(header) {
@@ -149,6 +149,7 @@
         }
     }
 </style>
+
 </head>
 <body>
     <div class="welcome-content">
