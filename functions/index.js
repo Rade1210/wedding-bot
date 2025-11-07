@@ -142,16 +142,6 @@ selectApp.post("/", async (req, res) => {
       }
     ]));
 
-    // Next action chips/buttons
-    const nextActionChips = {
-      type: "chips",
-      options: [
-        { text: "Proceed with booking" },
-        { text: "See more dresses" },
-        { text: "Start over" }
-      ]
-    };
-
     // Summary message with chips included in the same message
     const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. What would you like to do next?`;
 
@@ -163,8 +153,7 @@ selectApp.post("/", async (req, res) => {
           type: "description",
           title: "Selection Summary",
           text: [summary]
-        },
-        nextActionChips
+        }
       ]
     ];
 
