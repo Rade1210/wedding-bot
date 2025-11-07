@@ -41,7 +41,7 @@ findApp.post("/", async (req, res) => {
 
     let messages;
     if (matchingDresses.length === 0) {
-      messages = [{ text: { text: ["I couldn’t find any dresses matching your criteria. Would you like to adjust your search?"] } }];
+      messages = [{ text: { text: ["I couldn't find any dresses matching your criteria. Would you like to adjust your search?"] } }];
     } else {
       const richContent = matchingDresses.map((dress, idx) => [
         {
@@ -152,20 +152,26 @@ selectApp.post("/", async (req, res) => {
       ]
     };
 
-    // Combine all cards and chips into one richContent array (Messenger requires this!)
+    // Summary message with chips included in the same message
+    const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. What would you like to do next?`;
+
+    // Combine all cards, summary, and chips into one richContent array
     const richContentAll = [
       ...selectedDressCards,
-      [nextActionChips]
+      [
+        {
+          type: "description",
+          title: "Selection Summary",
+          text: [summary]
+        },
+        nextActionChips
+      ]
     ];
-
-    // Summary message
-    const summary = `You selected: ${selectedDresses.map(d => `"${d.name}"`).join(", ")}. What would you like to do next?`;
 
     res.json({
       fulfillment_response: {
         messages: [
-          { payload: { richContent: richContentAll } },
-          { text: { text: [summary] } }
+          { payload: { richContent: richContentAll } }
         ]
       }
     });
