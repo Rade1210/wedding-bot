@@ -7,19 +7,39 @@ const bodyParser = require("body-parser");
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-// ------------ FIND DRESS WEBHOOK ------------
+// ------------ FIND DRESS WEBHOOK (with hasDresses flag) ------------
 const findApp = express();
 findApp.use(bodyParser.json());
 
 findApp.post("/", async (req, res) => {
   try {
-    const params = req.body.sessionInfo.parameters;
-    const dressType = params.dress_type;
-    const dressSize = Number(params.dress_size);
-    const minPrice = Number(params.dress_min_price);
-    const maxPrice = Number(params.dress_max_price);
+    const params = req.body.sessionInfo?.parameters || {};
+    
+    console.log("FIND_DRESS FULL REQUEST BODY:", JSON.stringify(req.body, null, 2));
+    console.log("FIND_DRESS PARAMS:", JSON.stringify(params, null, 2));
 
-    console.log("FIND_DRESS INPUT PARAMS:", JSON.stringify(params, null, 2));
+    // Safely extract parameters with defaults
+    const dressType = params.dress_type || params.dressType || "";
+    const dressSize = Number(params.dress_size || params.dressSize || 0);
+    const minPrice = Number(params.dress_min_price || params.dressMinPrice || 0);
+    const maxPrice = Number(params.dress_max_price || params.dressMaxPrice || 10000);
+
+    console.log("Extracted parameters:");
+    console.log("- Type:", dressType);
+    console.log("- Size:", dressSize);
+    console.log("- Min Price:", minPrice);
+    console.log("- Max Price:", maxPrice);
+
+    // Validate required parameters
+    if (!dressType || !dressSize) {
+      return res.json({
+        fulfillment_response: {
+          messages: [
+            { text: { text: ["Missing dress type or size. Please provide all search criteria."] } }
+          ]
+        }
+      });
+    }
 
     const snapshot = await db.collection("dresses").get();
     const matchingDresses = [];
@@ -29,6 +49,7 @@ findApp.post("/", async (req, res) => {
       const typeMatch = data.type && data.type.toLowerCase() === dressType.toLowerCase();
       const sizeMatch = data.size_available && data.size_available.includes(dressSize);
       const inStock = !!data.in_stock;
+      
       if (inRange && typeMatch && sizeMatch && inStock) {
         matchingDresses.push({
           name: data.name,
@@ -39,9 +60,12 @@ findApp.post("/", async (req, res) => {
       }
     });
 
+    // Set simple boolean flag
+    const hasDresses = matchingDresses.length > 0;
+
     let messages;
-    if (matchingDresses.length === 0) {
-      messages = [{ text: { text: ["I couldn't find any dresses matching your criteria. Would you like to adjust your search?"] } }];
+    if (!hasDresses) {
+      messages = [{ text: { text: ["I couldn't find any dresses matching your criteria. You will be returned to the main menu."] } }];
     } else {
       const richContent = matchingDresses.map((dress, idx) => [
         {
@@ -69,7 +93,13 @@ findApp.post("/", async (req, res) => {
     }
 
     res.json({
-      sessionInfo: { parameters: { ...params, matchingDresses } },
+      sessionInfo: { 
+        parameters: { 
+          ...params, 
+          matchingDresses,
+          hasDresses: hasDresses  // Simple true/false flag
+        } 
+      },
       fulfillment_response: { messages }
     });
 
@@ -285,9 +315,7 @@ saveBookingApp.post("/", async (req, res) => {
           `Thank you ${customerName}!`,
           `Your dress fitting appointment has been scheduled.`,
           `**Date:** ${formattedDate.toLocaleDateString()}`,
-          `**Time:** ${formattedTime}`,
-          `**Booking ID:** ${bookingRef.id}`,
-          `We've sent confirmation details to ${customerEmail}`
+          `**Time:** ${formattedTime}`
         ]
       }
     ];
