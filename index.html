@@ -55,33 +55,49 @@
             top: auto !important;
         }
 
-        /* Clean chat bubble - NO animation, NO purple circle */
+        /* Remove ALL animations and purple background */
         df-messenger-chat-bubble {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
-            /* Remove all animations */
+            /* Remove all animations and transforms */
             animation: none !important;
-            /* Clean styling */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-            border: 2px solid white !important;
-            border-radius: 50% !important;
-            transition: all 0.2s ease !important;
+            transform: none !important;
+            /* Remove purple background */
+            background: transparent !important;
+            /* Remove custom styling that causes issues */
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: auto !important;
+            height: auto !important;
         }
 
-        /* Remove any background rectangle from the button */
+        /* Remove any custom button styling */
         .df-messenger-chat-bubble-button {
             background: transparent !important;
             border: none !important;
-            border-radius: 50% !important;
-            width: 100% !important;
-            height: 100% !important;
+            transform: none !important;
+            animation: none !important;
         }
 
-        /* Fix the icon inside */
+        /* Remove icon custom styling */
         .df-messenger-chat-bubble-icon {
             background: transparent !important;
             border: none !important;
+            transform: none !important;
+            animation: none !important;
+        }
+
+        /* COMPLETELY remove hover effects */
+        df-messenger-chat-bubble:hover,
+        df-messenger-chat-bubble:focus,
+        df-messenger-chat-bubble:active {
+            transform: none !important;
+            scale: none !important;
+            animation: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
 
         /* Chat window styling */
@@ -101,13 +117,8 @@
             --df-messenger-message-border-radius: 20px;
             --df-messenger-button-color: #8b5cf6;
             --df-messenger-input-box-border-radius: 25px;
-        }
-
-        /* Simple hover effect only */
-        df-messenger-chat-bubble:hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
-            transition: all 0.2s ease !important;
+            /* Remove purple bubble background variable */
+            --df-messenger-chat-bubble-background-color: transparent !important;
         }
 
         /* Features grid */
