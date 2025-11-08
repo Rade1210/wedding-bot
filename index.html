@@ -6,7 +6,9 @@
     <title>Wedding Dress Bot</title>
     <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <style>
     /* Reset and base styles */
     * {
@@ -87,30 +89,20 @@
     position: fixed;
     bottom: 30px;
     right: 30px;
-
-    --df-messenger-font-color: #111827;
-    --df-messenger-font-family: 'Segoe UI', sans-serif;
-    --df-messenger-chat-background: url('https://www.transparenttextures.com/patterns/xv.png'), #ffffff;
-    --df-messenger-button-background-color: #f3f4f6;
-    --df-messenger-button-hover-background-color: #e5e7eb;
-    --df-messenger-message-user-background: #f9fafb;  /* user messages - very light gray */
-    --df-messenger-message-bot-background: #f6f5f5;   /* bot messages - barely noticeable gray */
-    --df-messenger-chat-bubble-border-radius: 16px;
-    --df-messenger-message-border-radius: 16px;
-    --df-messenger-send-icon-color: #111827;
-    --df-messenger-chat-title-color: #111827;
-    --df-messenger-input-box-border-radius: 12px;
-    --df-messenger-input-box-focus-border-color: #9ca3af;
-    --df-messenger-input-box-background-color: #f9fafb;
+    --df-messenger-message-border-radius:8px;
+    --df-messenger-titlebar-background:radial-gradient(circle,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    --df-messenger-titlebar-font-color: white;
+    --df-messenger-chat-border-radius:6px;
+      --df-messenger-chat-bubble-icon-color: #ffffff !important;
     }
+    
 
     df-messenger::part(header) {
-        border-radius: 16px 16px 0 0;
+        
     }
 
     df-messenger::part(chat-message) {
-        font-size: 0.95rem;
-        line-height: 1.4;
+        
     }
 
     /* Mobile responsiveness */
