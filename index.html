@@ -18,7 +18,7 @@
     }
 
  button.material-icons.close-action.focus-outline-contrast.action-button {
-color:white !important 
+color:white !important;
 }
 
     body {
@@ -204,5 +204,14 @@ color:white !important
         <df-messenger-chat-bubble chat-title="Matilda" chat-icon="https://firebasestorage.googleapis.com/v0/b/wedding-storage-12336.firebasestorage.app/o/bride.png?alt=media&token=c69cb4d0-2c02-48c1-a92b-86937210259f">
         </df-messenger-chat-bubble>
     </df-messenger>
+
+    <script>
+        window.addEventListener('df-messenger-loaded', () => {
+        // Messenger is now ready.
+        const dfMessenger = document.querySelector('df-messenger');
+        dfMessenger.renderCustomText('Hello! I am Matilda, your personal wedding dress stylist. How can I assist you today? 👰‍♀️');
+        });
+    </script>
+    
 </body>
 </html>
