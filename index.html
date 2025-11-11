@@ -205,12 +205,11 @@ color:white !important;
         </df-messenger-chat-bubble>
     </df-messenger>
 
-    <script>
-        window.addEventListener('df-messenger-loaded', () => {
-        // Messenger is now ready.
-        const dfMessenger = document.querySelector('df-messenger');
-        dfMessenger.renderCustomText('Hello! I am Matilda, your personal wedding dress stylist. How can I assist you today? 👰‍♀️');
-        });
+      <script>
+    window.addEventListener('df-messenger-loaded', () => {
+      const dfMessenger = document.querySelector('df-messenger');
+      dfMessenger.renderCustomText('Hello! How can I assist you today?');
+    });
     </script>
     
 </body>
